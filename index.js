@@ -141,22 +141,16 @@ Pluploader.prototype.handleRequest = function plupload(req, res) {
       self.pendingUploads[fileIdentifier].files.push(fileData);
 
       self.uploadLimitReached(fileIdentifier).then(function(limitReached) {
+
         if (limitReached) {
-          res.status(413);
-          res.json({
-            'jsonrpc': '2.0',
-            'id': fileData.name,
-            'error': {
-              code: 500,
-              'message': 'File size exceeds upload limit of ' + self.options.uploadLimit + 'M'
-            },
-          });
+        	
+        	self.emit('error', {
+            	'id': fileData.name,
+        		'message': 'File size exceeds upload limit of ' + self.options.uploadLimit + 'M'
+        	});
+          
         } else {
           self.finalizePendingUploads(req);
-          res.json({
-            'jsonrpc': '2.0',
-            'id': fileData.name,
-          });
         }
       });
     })
