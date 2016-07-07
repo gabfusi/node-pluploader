@@ -76,6 +76,7 @@ Pluploader.prototype.finalizePendingUploads = function(req) {
 
       self.emit('fileUploaded', {
         name: filesData.name,
+        tempPath: filesData.tempPath,
         data: wholeFile,
         size: wholeFile.length,
         type: mimeType
@@ -138,14 +139,14 @@ Pluploader.prototype.handleRequest = function plupload(req, res) {
     fs.readFileAsync(files.file[0].path)
     .then(function(fileData) {
 
+	  self.pendingUploads[fileIdentifier].tempPath = files.file[0].path;
       self.pendingUploads[fileIdentifier].files.push(fileData);
 
       self.uploadLimitReached(fileIdentifier).then(function(limitReached) {
 
         if (limitReached) {
-        	
+
         	self.emit('error', {
-            	'id': fileData.name,
         		'message': 'File size exceeds upload limit of ' + self.options.uploadLimit + 'M'
         	});
           
